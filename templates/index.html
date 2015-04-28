@@ -4,6 +4,17 @@
     <title>cs390</title>
   </head>
   <body>
-    <h1>Hello World</h1>
+    {% if user %}
+      <h1>hello {{ user }}</h1>
+      <a href="/logout">logout</a>
+    {% else %}
+      <form action="register" method="post">
+        <input type="text" name="email"></input>
+        <input type="text" name="username"></input>
+        <input type="text" name="password"></input>
+        <input type="submit"></input>
+      </form>
+      <a href="/login">login</a>
+    {% endif %}
   </body>
 </html>
