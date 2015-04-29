@@ -45,7 +45,20 @@ def logout():
 
 @app.route('/search')
 def search():
-    return render_template('search.html')
+    if 'username' in session:
+        search = request.args.get('search')
+        friends = User.Query.all();
+        return render_template('search.html', friends=friends)
+    else:
+        return render_template('signup.html')
+
+@app.route('/addfriend')
+def addfriend():
+    if 'username' in session:
+        # TODO: friends table?
+        return request.args.get('email')
+    else:
+        return render_template('signup.html')
 
 if __name__ == '__main__':
     app.debug = True
