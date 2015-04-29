@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, escape, redirect, ur
 from parse_rest.user import User
 from parse_setup import setup
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 app.secret_key = 'Super secret string'
 
 @app.route('/')
