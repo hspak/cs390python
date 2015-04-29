@@ -43,6 +43,10 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
+@app.route('/search')
+def search():
+    return render_template('search.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
