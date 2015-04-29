@@ -9,9 +9,9 @@ app.secret_key = 'Super secret string'
 def index():
     if 'username' in session:
         user = escape(session['username'])
-        return render_template('index.html', user=user)
+        return render_template('home.html', user=user)
     else:
-        return render_template('index.html')
+        return render_template('signup.html')
 
 @app.route('/register', methods=['POST'])
 def register():

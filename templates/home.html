@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>hello {{ user }}</h1>
+  <form action="search" method="get">
+  <input type="text" name="search" id="search">
+  </form>
+  <a href="/logout">logout</a>
+  <!-- <script src="/js/search.js"></script> -->
+{% endblock %}
