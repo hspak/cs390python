@@ -1,15 +1,26 @@
 from flask import Flask, render_template, request, session, escape, redirect, url_for
 from parse_rest.user import User
+from parse_rest.datatypes import Object
 from parse_setup import setup
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.secret_key = 'Super secret string'
 
-@app.route('/')
+class Post(Object):
+  pass
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if 'username' in session:
         user = escape(session['username'])
-        return render_template('home.html', user=user)
+        if request.method == 'POST':
+            post = Post(text=request.form['post'])
+            #post.image = request.form['file']
+            post.groups = [{'UniqueID':'Family'}, {'UniqueID2':'Friends'}]
+            post.save()
+            return render_template('home.html', user=user)
+        else:
+            return render_template('home.html', user=user)
     else:
         return render_template('signup.html')
 
@@ -43,10 +54,11 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/friends')
-def friends():
+@app.route('/circles')
+def circles():
   if 'username' in session:
-      return render_template('friends.html', user=user)
+      friends = User.Query.all();
+      return render_template('circles.html', friends=friends)
   else:
       return render_template('signup.html')
 

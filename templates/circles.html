@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<table>
+      <thead>
+        <td>Name</td>
+        <td>Email</td>
+      </thead>
+      {% for f in friends %}
+        <tr>
+          <td>{{ f.username }}</td>
+          <td>{{ f.email }}</td>
+          <td><a href="/addfriend?email={{ f.email }}">Add friend</a></td>
+        </tr>
+      {% endfor %}
+    </table>
+
+{% endblock %}
