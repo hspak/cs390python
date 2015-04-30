@@ -227,12 +227,19 @@ def accept():
             fromCircle.save()
             toCircle.save()
         else:
-            fromCircle = Circle.Query.get(owner=toUserObj, name="all")
-            fromCircle.users.remove(toUserObj)
-            toCircle = Circle.Query.get(owner=fromUserObj, name="all")
-            toCircle.users.append(fromUserObj)
-            fromCircle.save()
-            toCircle.save()
+            try:
+                fromCircle = Circle.Query.get(owner=toUserObj, name="all")
+                fromCircle.users.remove(toUserObj)
+                fromCircle.save()
+            except:
+                pass
+
+            try:
+                toCircle = Circle.Query.get(owner=fromUserObj, name="all")
+                toCircle.users.remove(fromUserObj)
+                toCircle.save()
+            except:
+                pass
             
         return redirect(url_for('index'))
     else:
