@@ -52,8 +52,8 @@ def search():
     else:
         return render_template('signup.html')
 
-@app.route('/change', methods=['GET', 'POST'])
-def change():
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
     if 'username' in session:
         if request.method == 'POST':
             old_user = escape(session['username'])
@@ -61,12 +61,11 @@ def change():
             user = User.login(old_user, old_pass)
             user.username = request.form['newusername']
             user.password = request.form['newpassword']
-            user.email = request.form['newemail']
             user.save()
             session.pop('username', None)
             return render_template('index.html')
         else:
-            return render_template('change.html')
+            return render_template('settings.html')
     else:
         return render_template('signup.html')
 
