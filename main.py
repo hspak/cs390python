@@ -12,15 +12,17 @@ class Post(Object):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if 'username' in session:
-        user = escape(session['username'])
+        username = escape(session['username'])
         if request.method == 'POST':
+            user = User.Query.get(username=username);
             post = Post(text=request.form['post'])
             #post.image = request.form['file']
             post.groups = [{'UniqueID':'Family'}, {'UniqueID2':'Friends'}]
+            post.user = user
             post.save()
-            return render_template('home.html', user=user)
+            return render_template('home.html', username=username)
         else:
-            return render_template('home.html', user=user)
+            return render_template('home.html', username=username)
     else:
         return render_template('signup.html')
 
