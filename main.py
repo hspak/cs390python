@@ -19,11 +19,12 @@ class Request(Object):
 def index():
     if 'username' in session:
         username = escape(session['username'])
+        password = escape(session['password'])
         if request.method == 'POST':
-            user = User.Query.get(username=username);
+            user = User.login(username, password)
             post = Post(text=request.form['post'])
             #post.image = request.form['file']
-            post.groups = [{'UniqueID':'Family'}, {'UniqueID2':'Friends'}]
+            post.circles = user.postingTo
             post.user = user
             post.save()
             return render_template('home.html', username=username)
