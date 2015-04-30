@@ -20,7 +20,6 @@ def register():
     email = request.form['email']
     u = User.signup(username, password, email=email)
     u.save()
-    u.delete()
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -32,7 +31,6 @@ def login():
         session['password'] = password
         u = User.login(username, password)
         u.save()
-        u.delete()
         return redirect(url_for('index'))
     else:
         if 'username' in session:
@@ -65,7 +63,6 @@ def change():
             user.password = request.form['newpassword']
             user.email = request.form['newemail']
             user.save()
-            user.delete()
             session.pop('username', None)
             return render_template('index.html')
         else:
