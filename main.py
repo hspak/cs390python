@@ -123,7 +123,11 @@ def circles():
             circle.save()
             user.save()
         req = Request.Query.filter(toUser=username)
-        return render_template('circles.html', friends=friends, user=user, req=req)
+        circles = []
+        for c in user.circles:
+            circles.append(Circle.Query.get(objectId=c.get('objectId')))
+        print circles 
+        return render_template('circles.html', friends=friends, user=user, req=req, circles=circles)
     else:
         return render_template('signup.html')
 
