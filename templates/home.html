@@ -1,8 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>hello {{ user }}</h1>
-  <form action="search" method="get">
-  <input type="text" name="search" id="search">
-  </form>
-  <a href="/logout">logout</a>
+  <div class="container">
+    <div class="row">
+      <h1>hello, {{ user }}</h1>
+      <!--
+      <form action="search" method="get">
+      <input type="text" name="search" id="search">
+      </form>
+      -->
+      <p>
+        <a href="/settings">settings</a> &middot;
+        <a href="/logout">logout</a>
+      </p>
+      <!-- <script src="/js/search.js"></script> -->
+    </div> <!-- top row -->
+
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+
+        <div class="well">
+          <form>
+            <div class="input-group">
+              <input type="text" name="post" class="form-control" placeholder="What's on your mind?">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Post</button>
+              </span>
+            </div> <!-- /input-group -->    
+            <div class="form-group" style="margin-bottom: 0px;">
+              <input type="file" id="file" style="padding-top: 8px;">
+            </div>
+          </form>
+        </div>
+      
+      </div> <!-- centered column -->
+    </div> <!-- post row -->
+
+  </div> <!-- container -->
 {% endblock %}
