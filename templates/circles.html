@@ -2,17 +2,37 @@
 {% block content %}
   <div class="container">
 
-    {{ user }}
+    <div class="page-header">
+      <h1>Circles <small>{{ user.username }}</small></h1>
+    </div>
 
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <ul class="list-group">
+          {% for r in req %}
+            <li class="list-group-item">
+              <p style="margin-bottom: 0;">
+                Request from {{ r.fromUser }} <br>
+                <a href="/accept?toUser={{ user }}&fromUser={{ r.fromUser }}">Accept</a>
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div> <!-- requests row -->
+
+    <!-- 
     {% for r in req %}
       <h1>Request from {{ r.fromUser }}</h1>
       <a href="/accept?toUser={{ user }}&fromUser={{ r.fromUser }}">Accept</a>
     {% endfor %}
+    -->
 
     {% for f in friends %}
-      <h1>Friend {{ f.username }}<h1>
+      <h4>Friend {{ f.username }}<h4>
       <a href="/addfriend?email={{ f.email }}">Add friend</a>
     {% endfor %}
+    
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
 

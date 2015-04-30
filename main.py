@@ -45,7 +45,7 @@ def index():
             post.circles = user.postingTo
             post.user = user
             post.save()
-            return render_template('home.html', user=user)
+            return redirect(url_for('index'))
         else:
             posts = []
             allFriends = Circle.Query.get(owner=user, name="all")
@@ -123,7 +123,7 @@ def circles():
             circle.save()
             user.save()
         req = Request.Query.filter(toUser=username)
-        return render_template('circles.html', friends=friends, user=username, req=req)
+        return render_template('circles.html', friends=friends, user=user, req=req)
     else:
         return render_template('signup.html')
 
