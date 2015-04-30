@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, session, escape, redirect, ur
 from parse_rest.user import User
 from parse_rest.datatypes import Object
 from parse_setup import setup
-import urllib2
+import json, httplib
+
+UPLOAD_FOLDER = '/path/to/the/uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__, static_folder='static', static_url_path='')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'Super secret string'
 
 class Post(Object):
@@ -24,15 +28,19 @@ def index():
         if request.method == 'POST':
             user = User.login(username, password)
             post = Post(text=request.form['post'])
-            if request.form['file'] != '':
-                headers = {'X-Parse-Application-Id':  "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
-                           'X-Parse-REST-API-Key':   "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
-                           'Content-Type': 'image/jpeg'} 
-                print request.form['file']
-                url = "https://api.parse.com/1/files/" + request.form['file']
-                print url
-                req = urllib2.Request(url, None, headers)
-                urllib2.urlopen(req)
+            pic = request.files['file']
+            print "wtf"
+            if pic:
+                headers = {
+                "X-Parse-Application-Id": "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
+                "X-Parse-REST-API-Key": "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
+                "Content-Type": "image/jpeg"
+                }
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/files/pic.jpg', pic, headers)
+                result = json.loads(connection.getresponse().read())
+                print result
 
             post.circles = user.postingTo
             post.user = user
