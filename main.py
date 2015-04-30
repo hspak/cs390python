@@ -12,6 +12,9 @@ class Post(Object):
 class Circle(Object):
   pass
 
+class Request(Object):
+  pass
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if 'username' in session:
@@ -69,23 +72,22 @@ def logout():
 
 @app.route('/circles', methods=['GET', 'POST'])
 def circles():
-  if 'username' in session:
-      username = escape(session['username'])
-      password = escape(session['password'])
-      user = User.login(username, password)
-      friends = User.Query.all();
-      if request.method == 'POST':
-          circle = Circle(name=request.form['name'])
-          circle.users = [user]
-          circle.owner = user
-          user.circles.append(circle)
-          circle.save()
-          user.save()
-          return render_template('circles.html', friends=friends, user=user)
-      else:
-          return render_template('circles.html', friends=friends, user=user)
-  else:
-      return render_template('signup.html')
+    if 'username' in session:
+        username = escape(session['username'])
+        password = escape(session['password'])
+        user = User.login(username, password)
+        friends = User.Query.all();
+        if request.method == 'POST':
+            circle = Circle(name=request.form['name'])
+            circle.users = [user]
+            circle.owner = user
+            user.circles.append(circle)
+            circle.save()
+            user.save()
+        req = Request.Query.filter(toUser=username)
+        return render_template('circles.html', friends=friends, user=username, req=req)
+    else:
+        return render_template('signup.html')
 
 @app.route('/search')
 def search():
@@ -116,8 +118,30 @@ def change():
 @app.route('/addfriend')
 def addfriend():
     if 'username' in session:
-        # TODO: friends table?
-        return request.args.get('email')
+        email = request.args.get('email')
+        friend = User.Query.get(email=escape(email))
+        req = Request(fromUser=session['username'], toUser=friend.username)
+        req.save()
+        return redirect(url_for('index'))
+    else:
+        return render_template('signup.html')
+
+@app.route('/accept')
+def accept():
+    if 'username' in session:
+        toUser = request.args.get('toUser')
+        fromUser = request.args.get('fromUser')
+        username = escape(session['username'])
+        toUserObj = User.Query.get(username=username)
+        fromUserObj = User.Query.get(username=fromUser)
+
+        req = Request.Query.get(toUser=toUser, fromUser=fromUser)
+        req.delete()
+
+        circle = Circle.Query.get(owner=toUserObj)
+        circle.users.append(fromUserObj)
+        circle.save()
+        return redirect(url_for('index'))
     else:
         return render_template('signup.html')
 
