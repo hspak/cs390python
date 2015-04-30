@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<table>
-      <thead>
-        <td>Name</td>
-        <td>Email</td>
-      </thead>
-      {% for f in friends %}
-        <tr>
-          <td>{{ f.username }}</td>
-          <td>{{ f.email }}</td>
-          <td><a href="/addfriend?email={{ f.email }}">Add friend</a></td>
-        </tr>
-      {% endfor %}
-    </table>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
 
+        <div class="well">
+          <form method="post">
+            <div class="input-group">
+              <input type="text" name="name" class="form-control" placeholder="E.g. family or friends">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </span>
+            </div> <!-- /input-group -->    
+          </form>
+        </div>
+      
+      </div> <!-- centered column -->
+    </div> <!-- post row -->
+  </div>
 {% endblock %}

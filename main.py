@@ -9,6 +9,9 @@ app.secret_key = 'Super secret string'
 class Post(Object):
   pass
 
+class Circle(Object):
+  pass
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if 'username' in session:
@@ -32,6 +35,7 @@ def register():
     password = request.form['password']
     email = request.form['email']
     u = User.signup(username, password, email=email)
+    u.circles = []
     u.save()
     return redirect(url_for('index'))
 
@@ -56,11 +60,21 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/circles')
+@app.route('/circles', methods=['GET', 'POST'])
 def circles():
   if 'username' in session:
+      username = escape(session['username'])
+      user = User.Query.get(username=username);
       friends = User.Query.all();
-      return render_template('circles.html', friends=friends)
+      if request.method == 'POST':
+          circle = Circle(name=request.form['name'])
+          circle.users = [user]
+          circle.owner = user
+          #user.circles.append(circle)
+          circle.save()
+          return render_template('circles.html', friends=friends, user=user)
+      else:
+          return render_template('circles.html', friends=friends, user=user)
   else:
       return render_template('signup.html')
 
