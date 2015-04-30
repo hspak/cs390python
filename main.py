@@ -43,6 +43,13 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
+@app.route('/friends')
+def friends():
+  if 'username' in session:
+      return render_template('friends.html', user=user)
+  else:
+      return render_template('signup.html')
+
 @app.route('/search')
 def search():
     if 'username' in session:
@@ -53,14 +60,14 @@ def search():
         return render_template('signup.html')
 
 @app.route('/settings', methods=['GET', 'POST'])
-def settings():
+def change():
     if 'username' in session:
         if request.method == 'POST':
             old_user = escape(session['username'])
             old_pass = escape(session['password'])
             user = User.login(old_user, old_pass)
-            user.username = request.form['newusername']
-            user.password = request.form['newpassword']
+            user.username = request.form['username']
+            user.password = request.form['password']
             user.save()
             session.pop('username', None)
             return render_template('index.html')
