@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <form action="change" method="post">
+    <label for="newemail">New email</label>
+    <input type="text", name="newemail" id="newemail">
+    <label for="newusername">New username</label>
+    <input type="text", name="newusername" id="newusername">
+    <label for="newpassword">New password</label>
+    <input type="text", name="newpassword" id="newpassword">
+    <button type="submit">Update</button>
+  </form>
+{% endblock %}

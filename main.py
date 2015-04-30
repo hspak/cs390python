@@ -20,6 +20,7 @@ def register():
     email = request.form['email']
     u = User.signup(username, password, email=email)
     u.save()
+    u.delete()
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -31,6 +32,7 @@ def login():
         session['password'] = password
         u = User.login(username, password)
         u.save()
+        u.delete()
         return redirect(url_for('index'))
     else:
         if 'username' in session:
@@ -49,6 +51,25 @@ def search():
         search = request.args.get('search')
         friends = User.Query.all();
         return render_template('search.html', friends=friends)
+    else:
+        return render_template('signup.html')
+
+@app.route('/change', methods=['GET', 'POST'])
+def change():
+    if 'username' in session:
+        if request.method == 'POST':
+            old_user = escape(session['username'])
+            old_pass = escape(session['password'])
+            user = User.login(old_user, old_pass)
+            user.username = request.form['newusername']
+            user.password = request.form['newpassword']
+            user.email = request.form['newemail']
+            user.save()
+            user.delete()
+            session.pop('username', None)
+            return render_template('index.html')
+        else:
+            return render_template('change.html')
     else:
         return render_template('signup.html')
 
