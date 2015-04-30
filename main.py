@@ -35,8 +35,14 @@ def register():
     password = request.form['password']
     email = request.form['email']
     u = User.signup(username, password, email=email)
-    circle = Circle(name="all", owner=user, users=[user]) 
+    circle = Circle(name="all", owner=u, users=[u]) 
+    circle.save()
     u.circles = [circle]
+    u.save()
+
+    session['username'] = username
+    session['password'] = password
+    u = User.login(username, password)
     u.save()
     return redirect(url_for('index'))
 
