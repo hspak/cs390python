@@ -129,9 +129,12 @@ def accept():
         req = Request.Query.get(toUser=toUser, fromUser=fromUser)
         req.delete()
 
-        circle = Circle.Query.get(owner=toUserObj)
-        circle.users.append(fromUserObj)
-        circle.save()
+        fromCircle = Circle.Query.get(owner=toUserObj)
+        fromCircle.users.append(fromUserObj)
+        toCircle = Circle.Query.get(owner=fromuserObj)
+        toCircle.users.append(toUserObj)
+        fromCircle.save()
+        toCircle.save()
         return redirect(url_for('index'))
     else:
         return render_template('signup.html')
