@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, escape, redirect, ur
 from parse_rest.user import User
 from parse_rest.datatypes import Object
 from parse_setup import setup
+import urllib2
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.secret_key = 'Super secret string'
@@ -22,7 +23,16 @@ def index():
         if request.method == 'POST':
             user = User.Query.get(username=username);
             post = Post(text=request.form['post'])
-            #post.image = request.form['file']
+            if request.form['file'] != '':
+                headers = {'X-Parse-Application-Id':  "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
+                           'X-Parse-REST-API-Key':   "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
+                           'Content-Type': 'image/jpeg'} 
+                print request.form['file']
+                url = "https://api.parse.com/1/files/" + request.form['file']
+                print url
+                req = urllib2.Request(url, None, headers)
+                urllib2.urlopen(req)
+
             post.groups = [{'UniqueID':'Family'}, {'UniqueID2':'Friends'}]
             post.user = user
             post.save()
@@ -138,8 +148,8 @@ def rmfriend():
             for u in circle.users:
                 if u == rmUser:
                     circle.users.remove(u)
+                    circle.save()
                     break
-
         return redirect(url_for('index'))
     else:
         return render_template('signup.html')
@@ -157,9 +167,9 @@ def accept():
         req = Request.Query.get(toUser=toUser, fromUser=fromUser)
         req.delete()
 
-        fromCircle = Circle.Query.get(owner=toUserObj)
+        fromCircle = Circle.Query.get(owner=toUserObj, name="all")
         fromCircle.users.append(fromUserObj)
-        toCircle = Circle.Query.get(owner=fromuserObj)
+        toCircle = Circle.Query.get(owner=fromUserObj, name="all")
         toCircle.users.append(toUserObj)
         fromCircle.save()
         toCircle.save()
