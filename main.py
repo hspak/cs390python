@@ -47,7 +47,26 @@ def index():
             post.save()
             return render_template('home.html', username=username)
         else:
-            return render_template('home.html', username=username)
+            posts = []
+            user = User.Query.get(username=username)
+            allFriends = Circle.Query.get(owner=user, name="all")
+            for friend in allFriends.users:
+                friendObj = User.Query.get(objectId=friend.get('objectId'))
+                circlesIAmIn = []
+                for circle in friendObj.circles:
+                    circleObj = Circle.Query.get(objectId=circle.get('objectId'))
+                    for u in circleObj.users:
+                        if u.get('objectId') == user.objectId:
+                            circlesIAmIn.append(circleObj.name)
+                friendPosts = Post.Query.filter(user=friendObj)
+                for post in friendPosts:
+                    for i in circlesIAmIn:
+                        if i in post.circles:
+                            posts.append(post)
+                            break
+
+            sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)                 
+            return render_template('home.html', username=username, posts=sortedPosts)
     else:
         return render_template('signup.html')
 
