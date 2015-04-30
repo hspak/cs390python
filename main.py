@@ -210,21 +210,30 @@ def rmfriend():
 @app.route('/accept')
 def accept():
     if 'username' in session:
-        toUser = request.args.get('toUser')
         fromUser = request.args.get('fromUser')
+        accept = request.args.get('accept')
         username = escape(session['username'])
         toUserObj = User.Query.get(username=username)
         fromUserObj = User.Query.get(username=fromUser)
 
-        req = Request.Query.get(toUser=toUser, fromUser=fromUser)
+        req = Request.Query.get(toUser=username, fromUser=fromUser)
         req.delete()
 
-        fromCircle = Circle.Query.get(owner=toUserObj, name="all")
-        fromCircle.users.append(fromUserObj)
-        toCircle = Circle.Query.get(owner=fromUserObj, name="all")
-        toCircle.users.append(toUserObj)
-        fromCircle.save()
-        toCircle.save()
+        if accept == "yes":
+            fromCircle = Circle.Query.get(owner=toUserObj, name="all")
+            fromCircle.users.append(fromUserObj)
+            toCircle = Circle.Query.get(owner=fromUserObj, name="all")
+            toCircle.users.append(toUserObj)
+            fromCircle.save()
+            toCircle.save()
+        else:
+            fromCircle = Circle.Query.get(owner=toUserObj, name="all")
+            fromCircle.users.remove(toUserObj)
+            toCircle = Circle.Query.get(owner=fromUserObj, name="all")
+            toCircle.users.append(fromUserObj)
+            fromCircle.save()
+            toCircle.save()
+            
         return redirect(url_for('index'))
     else:
         return render_template('signup.html')

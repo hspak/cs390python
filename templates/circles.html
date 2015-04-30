@@ -13,7 +13,8 @@
             <li class="list-group-item">
               <p style="margin-bottom: 0;">
                 Request from {{ r.fromUser }} <br>
-                <a href="/accept?toUser={{ user }}&fromUser={{ r.fromUser }}">Accept</a>
+                <a href="/accept?toUser={{ user }}&fromUser={{ r.fromUser }}&accept=yes">Accept</a>
+                <a href="/accept?toUser={{ user }}&fromUser={{ r.fromUser }}&accept=no">Deny</a>
               </p>
             </li>
           {% endfor %}
