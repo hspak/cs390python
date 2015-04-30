@@ -64,14 +64,16 @@ def logout():
 def circles():
   if 'username' in session:
       username = escape(session['username'])
-      user = User.Query.get(username=username);
+      password = escape(session['password'])
+      user = User.login(username, password)
       friends = User.Query.all();
       if request.method == 'POST':
           circle = Circle(name=request.form['name'])
           circle.users = [user]
           circle.owner = user
-          #user.circles.append(circle)
+          user.circles.append(circle)
           circle.save()
+          user.save()
           return render_template('circles.html', friends=friends, user=user)
       else:
           return render_template('circles.html', friends=friends, user=user)
