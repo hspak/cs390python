@@ -39,13 +39,15 @@
 
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-
         {% for p in posts %}
-          <p>{{ p.text }}</p>
+          <div class="well">
+            <p>
+              <span style="font-weight:bold">{{ p.user.username }}</span>
+              {{ p.createdAt.strftime('%I:%M %p, %b %d %Y') }}<br>
+              {{ p.text }}
+            </p>
+          </div>
         {% endfor %}
-
-
-
       </div> <!-- column -->
     </div> <!-- feed row -->
    

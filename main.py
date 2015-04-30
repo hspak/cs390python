@@ -58,8 +58,8 @@ def index():
                             posts.append(post)
                             break
 
-            print posts                  
-            return render_template('home.html', username=username, posts=posts)
+            sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)                 
+            return render_template('home.html', username=username, posts=sortedPosts)
     else:
         return render_template('signup.html')
 
