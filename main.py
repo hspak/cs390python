@@ -38,7 +38,7 @@ def register():
     password = request.form['password']
     email = request.form['email']
     u = User.signup(username, password, email=email)
-    circle = Circle(name="all", owner=u, users=[u]) 
+    circle = Circle(name="all", owner=u, users=[u])
     circle.save()
     u.circles = [circle]
     u.save()
@@ -106,6 +106,15 @@ def change():
     else:
         return render_template('signup.html')
 
+@app.route('/search')
+def search():
+    if 'username' in session:
+        search = request.args.get('search')
+        friends = User.Query.all();
+        return render_template('search.html', friends=friends)
+    else:
+        return render_template('signup.html')
+
 @app.route('/addfriend')
 def addfriend():
     if 'username' in session:
@@ -116,6 +125,25 @@ def addfriend():
         return redirect(url_for('index'))
     else:
         return render_template('signup.html')
+
+@app.route('/rmfriend')
+def rmfriend():
+    if 'username' in session:
+        rmUsername = request.args.get('rmUser')
+        username = escape(session['username'])
+        user = User.Query.get(username=username)
+        rmUser = User.Query.get(username=rmUsername)
+        circles = Circle.Query.filter(owner=user)
+        for circle in circles:
+            for u in circle.users:
+                if u == rmUser:
+                    circle.users.remove(u)
+                    break
+
+        return redirect(url_for('index'))
+    else:
+        return render_template('signup.html')
+
 
 @app.route('/accept')
 def accept():
