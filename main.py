@@ -89,15 +89,6 @@ def circles():
     else:
         return render_template('signup.html')
 
-@app.route('/search')
-def search():
-    if 'username' in session:
-        search = request.args.get('search')
-        friends = User.Query.all();
-        return render_template('search.html', friends=friends)
-    else:
-        return render_template('signup.html')
-
 @app.route('/settings', methods=['GET', 'POST'])
 def change():
     if 'username' in session:
