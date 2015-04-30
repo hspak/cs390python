@@ -24,6 +24,7 @@ def index():
         if request.method == 'POST':
             user = User.login(username, password)
             post = Post(text=request.form['post'])
+            '''
             if request.form['file'] != '':
                 headers = {'X-Parse-Application-Id':  "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
                            'X-Parse-REST-API-Key':   "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
@@ -33,13 +34,32 @@ def index():
                 print url
                 req = urllib2.Request(url, None, headers)
                 urllib2.urlopen(req)
-
+            '''
             post.circles = user.postingTo
             post.user = user
             post.save()
             return render_template('home.html', username=username)
         else:
-            return render_template('home.html', username=username)
+            posts = []
+            user = User.Query.get(username=username)
+            allFriends = Circle.Query.get(owner=user, name="all")
+            for friend in allFriends.users:
+                friendObj = User.Query.get(objectId=friend.get('objectId'))
+                circlesIAmIn = []
+                for circle in friendObj.circles:
+                    circleObj = Circle.Query.get(objectId=circle.get('objectId'))
+                    for u in circleObj.users:
+                        if u.get('objectId') == user.objectId:
+                            circlesIAmIn.append(circleObj.name)
+                friendPosts = Post.Query.filter(user=friendObj)
+                for post in friendPosts:
+                    for i in circlesIAmIn:
+                        if i in post.circles:
+                            posts.append(post)
+                            break
+
+            print posts                  
+            return render_template('home.html', username=username, posts=posts)
     else:
         return render_template('signup.html')
 
