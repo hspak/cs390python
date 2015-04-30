@@ -41,6 +41,7 @@ def register():
     circle = Circle(name="all", owner=u, users=[u])
     circle.save()
     u.circles = [circle]
+    u.postingTo = ['all']
     u.save()
 
     session['username'] = username
@@ -90,19 +91,25 @@ def circles():
         return render_template('signup.html')
 
 @app.route('/settings', methods=['GET', 'POST'])
-def change():
+def settings():
     if 'username' in session:
+        old_user = escape(session['username'])
+        old_pass = escape(session['password'])
+        user = User.login(old_user, old_pass)
         if request.method == 'POST':
-            old_user = escape(session['username'])
-            old_pass = escape(session['password'])
-            user = User.login(old_user, old_pass)
             user.username = request.form['username']
             user.password = request.form['password']
             user.save()
             session.pop('username', None)
-            return render_template('index.html')
-        else:
-            return render_template('settings.html')
+            
+        circles = []
+        for circle in user.circles:
+            c = Circle.Query.get(objectId=circle.get('objectId'))
+            circles.append(c.name)
+
+        checked = list(set(circles) & set(user.postingTo))
+        unchecked = list(set(circles) - set(checked))
+        return render_template('settings.html', checked=checked, unchecked=unchecked)
     else:
         return render_template('signup.html')
 
@@ -112,6 +119,20 @@ def search():
         search = request.args.get('search')
         friends = User.Query.all();
         return render_template('search.html', friends=friends)
+    else:
+        return render_template('signup.html')
+
+@app.route('/updateCircles', methods=['POST'])
+def updateCircles():
+    if 'username' in session:
+        old_user = escape(session['username'])
+        old_pass = escape(session['password'])
+        user = User.login(old_user, old_pass)
+        if request.method == 'POST':
+            cKeys = dict((key, request.form.getlist(key)) for key in request.form.keys())
+            user.postingTo = list(cKeys.keys())
+            user.save()
+            return redirect(url_for('settings'))
     else:
         return render_template('signup.html')
 
