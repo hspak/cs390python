@@ -25,8 +25,8 @@ def index():
     if 'username' in session:
         username = escape(session['username'])
         password = escape(session['password'])
+        user = User.login(username, password)
         if request.method == 'POST':
-            user = User.login(username, password)
             post = Post(text=request.form['post'])
             pic = request.files['file']
             print "wtf"
@@ -45,10 +45,9 @@ def index():
             post.circles = user.postingTo
             post.user = user
             post.save()
-            return render_template('home.html', username=username)
+            return render_template('home.html', user=user)
         else:
             posts = []
-            user = User.Query.get(username=username)
             allFriends = Circle.Query.get(owner=user, name="all")
             for friend in allFriends.users:
                 friendObj = User.Query.get(objectId=friend.get('objectId'))
@@ -66,7 +65,7 @@ def index():
                             break
 
             sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)                 
-            return render_template('home.html', username=username, posts=sortedPosts)
+            return render_template('home.html', user=user, posts=sortedPosts)
     else:
         return render_template('signup.html')
 

@@ -2,7 +2,7 @@
 {% block content %}
   <div class="container">
     <div class="row">
-      <h1>hello, {{ username }}</h1>
+      <h1>hello, {{ user.username }}</h1>
       <!--
       <form action="search" method="get">
       <input type="text" name="search" id="search">
@@ -29,7 +29,11 @@
             </div> <!-- /input-group -->    
             <div class="form-group" style="margin-bottom: 0px;">
               <input type="file" name="file" id="file" style="padding-top: 8px;">
-              <p class="help-block" style="margin-bottom: 0;">Posting to Friends, Family</p>
+              <p class="help-block" style="margin-bottom: 0;">Currently posting to
+                {% for p in user.postingTo %}
+                  <span class="label label-primary">{{ p }}</span>
+                {% endfor %}
+              </p>
             </div>
           </form>
         </div>
