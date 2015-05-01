@@ -59,16 +59,29 @@
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         {% for p in posts %}
-          <div class="well">
-            <p>
-              <span style="font-weight:bold">{{ p.user.username }}</span>
-              <img src="{{ p.user.profilePic }}">
-              {{ p.createdAt.strftime('%I:%M %p, %b %d %Y') }}<br>
-              {{ p.text }}
-              {% if p.imgUrl %}
-                <a href="{{ p.imgUrl }}" class="thumbnail"><img src="{{ p.imgUrl }}"></a>
-              {% endif %}
-            </p>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="media">
+                {% if p.user.profilePic %}
+                  <div class="media-left">
+                    <a href="{{ p.user.profilePic }}">
+                      <img class="media-object" src="{{ p.user.profilePic }}" height="64" width="64">
+                    </a>
+                  </div>
+                {% endif %}
+                <div class="media-body">
+                  <h4 class="media-heading">
+                    {{ p.user.username }}
+                    <small>{{ p.createdAt.strftime('%I:%M %p, %b %d %Y') }}</small>
+                  </h4>
+                  <p>{{ p.text }}</p>
+                  {% if p.imgUrl %}
+                    <a href="{{ p.imgUrl }}" class="thumbnail"><img src="{{ p.imgUrl }}"></a>
+                  {% endif %}
+                  
+                </div> <!-- media body -->
+              </div> <!-- media -->
+            </div> <!-- panel body -->
           </div>
         {% endfor %}
       </div> <!-- column -->
