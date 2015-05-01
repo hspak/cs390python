@@ -18,6 +18,9 @@
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Update user information</h3>
+              {% if bad %}
+                Account not verified
+              {% endif %}
             </div>
             <div class="panel-body">
               <form action="settings" method="post" enctype="multipart/form-data"> 

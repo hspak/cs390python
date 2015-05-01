@@ -183,7 +183,7 @@ def settings():
 
         checked = list(set(circles) & set(userLogin.postingTo))
         unchecked = list(set(circles) - set(checked))
-        return render_template('settings.html', checked=checked, unchecked=unchecked)
+        return render_template('settings.html', checked=checked, unchecked=unchecked, bad=not userLogin.emailVerified)
     else:
         session.pop('username', None)
         session.pop('password', None)
