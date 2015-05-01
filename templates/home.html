@@ -28,7 +28,7 @@
               </span>
             </div> <!-- /input-group -->    
             <div class="form-group" style="margin-bottom: 0px;">
-              <input type="file" name="file" id="file" style="padding-top: 8px;">
+              <input type="file" name="file" style="padding-top: 8px;">
               <p class="help-block" style="margin-bottom: 0;">Currently posting to
                 {% for p in user.postingTo %}
                   <span class="label label-primary">{{ p }}</span>
@@ -49,6 +49,7 @@
               <span style="font-weight:bold">{{ p.user.username }}</span>
               {{ p.createdAt.strftime('%I:%M %p, %b %d %Y') }}<br>
               {{ p.text }}
+              <img src="{{ p.imgUrl }}">
             </p>
           </div>
         {% endfor %}

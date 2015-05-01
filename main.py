@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, session, escape, redirect, url_for
 from parse_rest.user import User
 from parse_rest.datatypes import Object
+from werkzeug import secure_filename
 from parse_setup import setup
 import json, httplib
+import os
 
-UPLOAD_FOLDER = '/path/to/the/uploads'
+UPLOAD_FOLDER = '/Users/hsp/code/cs390python/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -28,9 +30,10 @@ def index():
         user = User.login(username, password)
         if request.method == 'POST':
             post = Post(text=request.form['post'])
-            pic = request.files['file']
-            print "wtf"
-            if pic:
+            file = request.files['file']
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 headers = {
                 "X-Parse-Application-Id": "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
                 "X-Parse-REST-API-Key": "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
@@ -38,9 +41,9 @@ def index():
                 }
                 connection = httplib.HTTPSConnection('api.parse.com', 443)
                 connection.connect()
-                connection.request('POST', '/1/files/pic.jpg', pic, headers)
+                connection.request('POST', '/1/files/' + filename, open(filename, 'rb'), headers)
                 result = json.loads(connection.getresponse().read())
-                print result
+                post.imgUrl = result['url'];
 
             post.circles = user.postingTo
             post.user = user
@@ -137,11 +140,19 @@ def settings():
         old_user = escape(session['username'])
         old_pass = escape(session['password'])
         user = User.login(old_user, old_pass)
-        if request.method == 'POST':
-            user.username = request.form['username']
-            user.password = request.form['password']
-            user.save()
+        if request.method == 'POST' and user:
+            if request.form['username'] != '':
+                # user.username = request.form['username']
+                user.username = "wtf"
+                user.save()
+                print "AM I SEEING THIS " + user.username
+            if request.form['password'] != '':
+                user.password = request.form['password']
+                user.save()
+
             session.pop('username', None)
+            session.pop('password', None)
+            return redirect(url_for('index'))
             
         circles = []
         for circle in user.circles:
