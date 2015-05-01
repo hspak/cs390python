@@ -192,9 +192,14 @@ def settings():
 @app.route('/search')
 def search():
     if 'username' in session:
-        search = request.args.get('search')
-        friends = User.Query.all();
-        return render_template('search.html', friends=friends)
+        query = request.args.get('query')
+        allUsers = User.Query.all();
+        friends = []
+        for user in allUsers:
+            if query in user.username:
+                friends.append(user)
+            
+        return render_template('search.html', friends=friends, query=query)
     else:
         return render_template('signup.html')
 

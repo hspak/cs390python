@@ -1,22 +1,22 @@
-<!doctype html>
-<html>
-  <head>
-    <title>cs390</title>
-  </head>
-  <body>
-    <h1>Search</h1>
-    <table>
-      <thead>
-        <td>Name</td>
-        <td>Email</td>
-      </thead>
-      {% for f in friends %}
-        <tr>
-          <td>{{ f.username }}</td>
-          <td>{{ f.email }}</td>
-          <td><a href="/addfriend?email={{ f.email }}">Add friend</a></td>
-        </tr>
-      {% endfor %}
-    </table>
-  </body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Search <small>Showing results for {{ query }}</small></h1>
+  </div>
+
+  <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        {% for f in friends %}
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <h4>{{ f.username }} <small>{{ f.email }} &middot;
+                  <a href="/addfriend?email={{ f.email }}">Add friend</a>
+              </small><h4>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
