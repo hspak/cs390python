@@ -6,7 +6,7 @@ from parse_setup import setup
 import json, httplib
 import os
 
-UPLOAD_FOLDER = '/Users/hsp/code/cs390python/'
+UPLOAD_FOLDER = '/Users/austinlouden/Documents/cs390python/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -196,7 +196,7 @@ def search():
         allUsers = User.Query.all();
         friends = []
         for user in allUsers:
-            if query in user.username:
+            if query.lower() in user.username.lower():
                 friends.append(user)
 
         return render_template('search.html', friends=friends, query=query)

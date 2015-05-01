@@ -62,9 +62,12 @@
           <div class="well">
             <p>
               <span style="font-weight:bold">{{ p.user.username }}</span>
+              <img src="{{ p.user.profilePic }}">
               {{ p.createdAt.strftime('%I:%M %p, %b %d %Y') }}<br>
               {{ p.text }}
-              <img src="{{ p.imgUrl }}">
+              {% if p.imgUrl %}
+                <a href="{{ p.imgUrl }}" class="thumbnail"><img src="{{ p.imgUrl }}"></a>
+              {% endif %}
             </p>
           </div>
         {% endfor %}
