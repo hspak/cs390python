@@ -228,16 +228,37 @@ def friendCircles():
         user = User.login(old_user, old_pass)
         fid = request.form['fid']
         if request.method == 'POST':
+            print "add list", request.form.keys()
             for key in request.form.keys():
                 if key == 'fid':
                     continue
-                print key
-                print user
                 circle = Circle.Query.get(name=key, owner=user)
                 if not fid in circle.users:
                     circle.users.append(User.Query.get(objectId=fid))
+                    
+            all_circle = []
+            circle = False
+            for c in user.circles:
+                all_circle.append(Circle.Query.get(objectId=c['objectId']).name)
+            not_circle = list(set(all_circle) - set(request.form.keys()))
+            print "remove list", not_circle
 
-            circle.save()
+            for key in not_circle:
+                if key == 'all' or key == 'fid':
+                    continue
+                circle = Circle.Query.get(name=key, owner=user)
+                f = User.Query.get(objectId=fid)
+                print "rm", f, "in", circle.users
+                for u in circle.users:
+                    print "removing", fid
+                    circle.users[:] = [d for d in circle.users if d.get('objectId') != fid]
+                    circle.save()
+                    # if fid == u['objectId']:
+                        # circle.users.remove(User.Query.get(objectId=fid))
+                        # break
+
+            if circle:
+                print "saved", circle.users
             return redirect(url_for('circles'))
     else:
         session.pop('username', None)
