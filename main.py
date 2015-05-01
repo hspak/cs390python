@@ -70,6 +70,8 @@ def index():
             sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)                 
             return render_template('home.html', user=user, posts=sortedPosts)
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 @app.route('/register', methods=['POST'])
@@ -109,6 +111,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('password', None)
     return redirect(url_for('index'))
 
 @app.route('/circles', methods=['GET', 'POST'])
@@ -139,30 +142,45 @@ def settings():
     if 'username' in session:
         old_user = escape(session['username'])
         old_pass = escape(session['password'])
-        user = User.login(old_user, old_pass)
-        if request.method == 'POST' and user:
+        userLogin = User.login(old_user, old_pass)
+        if request.method == 'POST' and userLogin:
             if request.form['username'] != '':
-                # user.username = request.form['username']
-                user.username = "wtf"
-                user.save()
-                print "AM I SEEING THIS " + user.username
+                userLogin.username = request.form['username']
             if request.form['password'] != '':
-                user.password = request.form['password']
-                user.save()
+                userLogin.password = request.form['password']
 
-            session.pop('username', None)
-            session.pop('password', None)
-            return redirect(url_for('index'))
+            file = request.files['file']
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                headers = {
+                "X-Parse-Application-Id": "h2Co5EGV2YoBuPL2Cl7axkcLE0s9FNKpaPcpSbNm",
+                "X-Parse-REST-API-Key": "o59euguskg7BBNZlFEuVxTNL0u93glStq7memfVH",
+                "Content-Type": "image/jpeg"
+                }
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/files/' + filename, open(filename, 'rb'), headers)
+                result = json.loads(connection.getresponse().read())
+                userLogin.profilePic = result['url'];
+
+            userLogin.save()
+            if request.form['username'] != '' or request.form['password'] != '':
+                session.pop('username', None)
+                session.pop('password', None)
+                return render_template('login.html')
             
         circles = []
-        for circle in user.circles:
+        for circle in userLogin.circles:
             c = Circle.Query.get(objectId=circle.get('objectId'))
             circles.append(c.name)
 
-        checked = list(set(circles) & set(user.postingTo))
+        checked = list(set(circles) & set(userLogin.postingTo))
         unchecked = list(set(circles) - set(checked))
         return render_template('settings.html', checked=checked, unchecked=unchecked)
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 @app.route('/search')
@@ -186,6 +204,8 @@ def updateCircles():
             user.save()
             return redirect(url_for('settings'))
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 @app.route('/addfriend')
@@ -197,6 +217,8 @@ def addfriend():
         req.save()
         return redirect(url_for('index'))
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 @app.route('/rmfriend')
@@ -215,6 +237,8 @@ def rmfriend():
                     break
         return redirect(url_for('index'))
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 
@@ -254,6 +278,8 @@ def accept():
             
         return redirect(url_for('index'))
     else:
+        session.pop('username', None)
+        session.pop('password', None)
         return render_template('signup.html')
 
 if __name__ == '__main__':
