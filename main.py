@@ -230,17 +230,20 @@ def addfriend():
 @app.route('/rmfriend')
 def rmfriend():
     if 'username' in session:
-        rmUsername = request.args.get('rmUser')
+        rmObj = request.args.get('friend')
         username = escape(session['username'])
         user = User.Query.get(username=username)
-        rmUser = User.Query.get(username=rmUsername)
+        rmUser = User.Query.get(objectId=rmObj)
         circles = Circle.Query.filter(owner=user)
         for circle in circles:
-            for u in circle.users:
-                if u == rmUser:
-                    circle.users.remove(u)
-                    circle.save()
-                    break
+            try:
+                for u in circle.users:
+                    if u['objectId'] == rmUser.objectId:
+                        circle.users.remove(u)
+                        circle.save()
+                        break
+            except:
+                break
         return redirect(url_for('index'))
     else:
         session.pop('username', None)
