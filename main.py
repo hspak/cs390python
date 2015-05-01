@@ -223,42 +223,36 @@ def updateCircles():
 @app.route('/friendCircles', methods=['POST'])
 def friendCircles():
     if 'username' in session:
-        old_user = escape(session['username'])
-        old_pass = escape(session['password'])
-        user = User.login(old_user, old_pass)
+        username = escape(session['username'])
+        password = escape(session['password'])
+        user = User.login(username, password)
         fid = request.form['fid']
-        if request.method == 'POST':
-            print "add list", request.form.keys()
-            for key in request.form.keys():
-                if key == 'fid':
-                    continue
-                circle = Circle.Query.get(name=key, owner=user)
-                if not fid in circle.users:
-                    circle.users.append(User.Query.get(objectId=fid))
-                    
-            all_circle = []
-            circle = False
-            for c in user.circles:
-                all_circle.append(Circle.Query.get(objectId=c['objectId']).name)
-            not_circle = list(set(all_circle) - set(request.form.keys()))
-            print "remove list", not_circle
+        print fid
 
-            for key in not_circle:
-                if key == 'all' or key == 'fid':
-                    continue
-                circle = Circle.Query.get(name=key, owner=user)
-                f = User.Query.get(objectId=fid)
-                print "rm", f, "in", circle.users
-                for u in circle.users:
-                    print "removing", fid
-                    circle.users[:] = [d for d in circle.users if d.get('objectId') != fid]
-                    circle.save()
-                    # if fid == u['objectId']:
-                        # circle.users.remove(User.Query.get(objectId=fid))
-                        # break
+        updated = []
+        for key in request.form.keys():
+            if key != 'fid':
+                updated.append(key)
 
-            if circle:
-                print "saved", circle.users
+        for circleRef in user.circles:
+            circle = Circle.Query.get(objectId=circleRef['objectId'])
+            if circle.name == 'all':
+                continue
+
+            userIds = []
+            for u in circle.users:
+                userIds.append(u['objectId'])
+            if circle.name in updated:
+                # add to this circle if necessary
+                if fid not in userIds:
+                    friend = User.Query.get(objectId=fid)
+                    circle.users.append(friend)
+            else:
+                # remove from this circle if necessary
+                if fid in userIds:
+                    circle.users[:] = [x for x in circle.users if x.get('objectId') != fid]
+
+            circle.save()
             return redirect(url_for('circles'))
     else:
         session.pop('username', None)
@@ -336,7 +330,7 @@ def accept():
             except:
                 pass
 
-        return redirect(url_for('index'))
+        return redirect(url_for('circles'))
     else:
         session.pop('username', None)
         session.pop('password', None)
@@ -355,13 +349,14 @@ def edit():
 
         circles = Circle.Query.filter(owner=user)
         for circle in circles:
-            circlesAll.append(circle.name)
+            if circle.name != 'all':
+                circlesAll.append(circle.name)
             for u in circle.users:
                 if u['objectId'] == friend.objectId:
-                    circlesIn.append(circle.name)
+                    if circle.name != 'all':
+                        circlesIn.append(circle.name)
 
-        # circles.remove(Circle.Query.get(owner=user, name='all'))
-        checked = set(circlesIn)
+        checked = circlesIn
         unchecked = list(set(circlesAll) - set(circlesIn))
         return render_template('edit.html', checked=checked, unchecked=unchecked, fid=f)
     else:
