@@ -117,7 +117,6 @@ def circles():
         username = escape(session['username'])
         password = escape(session['password'])
         user = User.login(username, password)
-        friends = User.Query.all();
         if request.method == 'POST':
             circle = Circle(name=request.form['name'])
             circle.users = [user]
@@ -125,12 +124,20 @@ def circles():
             user.circles.append(circle)
             circle.save()
             user.save()
+            return redirect(url_for('circles'))
         req = Request.Query.filter(toUser=username)
+        friends = []
         circles = []
         for c in user.circles:
-            circles.append(Circle.Query.get(objectId=c.get('objectId')))
-        print circles 
-        return render_template('circles.html', friends=friends, user=user, req=req, circles=circles)
+            circle = Circle.Query.get(objectId=c.get('objectId'))
+            circles.append(circle)
+            if circle.name == 'all':
+                for u in circle.users: 
+                    friend = User.Query.get(objectId=u.get('objectId'))
+                    if friend.objectId != user.objectId:
+                        friends.append(friend)
+        print circles
+        return render_template('circles.html', user=user, req=req, friends=friends, circles=circles)
     else:
         return render_template('signup.html')
 
