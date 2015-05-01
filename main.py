@@ -226,7 +226,7 @@ def addfriend():
         friend = User.Query.get(email=escape(email))
         req = Request(fromUser=session['username'], toUser=friend.username)
         req.save()
-        return redirect(url_for('index'))
+        return redirect(url_for('circles'))
     else:
         session.pop('username', None)
         session.pop('password', None)
@@ -249,7 +249,7 @@ def rmfriend():
                         break
             except:
                 break
-        return redirect(url_for('index'))
+        return redirect(url_for('circles'))
     else:
         session.pop('username', None)
         session.pop('password', None)
