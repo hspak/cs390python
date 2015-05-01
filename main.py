@@ -67,7 +67,7 @@ def index():
                             posts.append(post)
                             break
 
-            sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)                 
+            sortedPosts = sorted(posts, key=lambda x: x.createdAt, reverse=True)
             return render_template('home.html', user=user, posts=sortedPosts)
     else:
         session.pop('username', None)
@@ -135,7 +135,7 @@ def circles():
             circle = Circle.Query.get(objectId=c.get('objectId'))
             circles.append(circle)
             if circle.name == 'all':
-                for u in circle.users: 
+                for u in circle.users:
                     friend = User.Query.get(objectId=u.get('objectId'))
                     if friend.objectId != user.objectId:
                         friends.append(friend)
@@ -175,7 +175,7 @@ def settings():
                 session.pop('username', None)
                 session.pop('password', None)
                 return render_template('login.html')
-            
+
         circles = []
         for circle in userLogin.circles:
             c = Circle.Query.get(objectId=circle.get('objectId'))
@@ -198,7 +198,7 @@ def search():
         for user in allUsers:
             if query in user.username:
                 friends.append(user)
-            
+
         return render_template('search.html', friends=friends, query=query)
     else:
         return render_template('signup.html')
@@ -206,14 +206,39 @@ def search():
 @app.route('/updateCircles', methods=['POST'])
 def updateCircles():
     if 'username' in session:
-        old_user = escape(session['username'])
-        old_pass = escape(session['password'])
-        user = User.login(old_user, old_pass)
+        username = escape(session['username'])
+        password = escape(session['password'])
+        user = User.login(username, password)
         if request.method == 'POST':
             cKeys = dict((key, request.form.getlist(key)) for key in request.form.keys())
             user.postingTo = list(cKeys.keys())
             user.save()
             return redirect(url_for('settings'))
+
+    else:
+        session.pop('username', None)
+        session.pop('password', None)
+        return render_template('signup.html')
+
+@app.route('/friendCircles', methods=['POST'])
+def friendCircles():
+    if 'username' in session:
+        old_user = escape(session['username'])
+        old_pass = escape(session['password'])
+        user = User.login(old_user, old_pass)
+        fid = request.form['fid']
+        if request.method == 'POST':
+            for key in request.form.keys():
+                if key == 'fid':
+                    continue
+                print key
+                print user
+                circle = Circle.Query.get(name=key, owner=user)
+                if not fid in circle.users:
+                    circle.users.append(User.Query.get(objectId=fid))
+
+            circle.save()
+            return redirect(url_for('circles'))
     else:
         session.pop('username', None)
         session.pop('password', None)
@@ -289,7 +314,7 @@ def accept():
                 toCircle.save()
             except:
                 pass
-            
+
         return redirect(url_for('index'))
     else:
         session.pop('username', None)
@@ -300,19 +325,24 @@ def accept():
 def edit():
     if 'username' in session:
         circlesIn = []
+        circlesAll = []
         username = escape(session['username'])
         password = escape(session['password'])
         user = User.login(username, password)
-        fid = request.args.get('user')
+        f = request.args.get('friend')
+        friend = User.Query.get(objectId=f)
 
         circles = Circle.Query.filter(owner=user)
         for circle in circles:
+            circlesAll.append(circle.name)
             for u in circle.users:
-                if fid == u.get('objectId'): 
+                if u['objectId'] == friend.objectId:
                     circlesIn.append(circle.name)
 
-        print circlesIn
-        return render_template('edit.html', circles=circles, circlesIn=circlesIn)
+        # circles.remove(Circle.Query.get(owner=user, name='all'))
+        checked = set(circlesIn)
+        unchecked = list(set(circlesAll) - set(circlesIn))
+        return render_template('edit.html', checked=checked, unchecked=unchecked, fid=f)
     else:
         return render_template('signup.html')
 

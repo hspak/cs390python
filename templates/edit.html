@@ -2,7 +2,26 @@
 {% block content %}
   <div class="jumbotron vertical-center">
     <div class="container">
+      <form action="friendCircles" method="post">
+        <input type="hidden" name="fid" value="{{ fid }}">
+        <div class="checkbox">
+          {% for c in checked %}
+            <label class="checkbox-inline">
+              <input type="checkbox" name="{{ c }}" value="{{ c }}" checked>
+              {{ c }}
+            </label>
+          {% endfor %}
 
+            {% for c in unchecked %}
+            <label class="checkbox-inline">
+              <input type="checkbox" name ="{{ c }}" value="{{ c }}">
+              {{ c }}
+            </label>
+          {% endfor %}
+
+        </div>
+      <button type="submit" class="btn btn-default">Update</button>
+      </form> 
     </div>
   </div>
 {% endblock %}
