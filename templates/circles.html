@@ -53,7 +53,9 @@
         {% for f in friends %}
           <div class="panel panel-default">
             <div class="panel-body">
-              <h4>{{ f.username }} <small>{{ f.email }}</small><h4>
+              <h4>{{ f.username }} <small>{{ f.email }} &middot;
+                  <a style="text-align: right;" href="/edit?friend={{ f.objectId }}">Edit</a> 
+              </small><h4>
             </div>
           </div>
         {% endfor %}

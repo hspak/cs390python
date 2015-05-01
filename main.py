@@ -136,7 +136,6 @@ def circles():
                     friend = User.Query.get(objectId=u.get('objectId'))
                     if friend.objectId != user.objectId:
                         friends.append(friend)
-        print circles
         return render_template('circles.html', user=user, req=req, friends=friends, circles=circles)
     else:
         return render_template('signup.html')
@@ -260,6 +259,15 @@ def accept():
                 pass
             
         return redirect(url_for('index'))
+    else:
+        return render_template('signup.html')
+
+@app.route('/edit')
+def edit():
+    if 'username' in session:
+        fid = request.args.get('user')
+        friend = User.Query.get(objectId=fid)
+        return render_template('edit.html')
     else:
         return render_template('signup.html')
 
