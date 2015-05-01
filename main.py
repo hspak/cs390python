@@ -294,9 +294,20 @@ def accept():
 @app.route('/edit')
 def edit():
     if 'username' in session:
+        circlesIn = []
+        username = escape(session['username'])
+        password = escape(session['password'])
+        user = User.login(username, password)
         fid = request.args.get('user')
-        friend = User.Query.get(objectId=fid)
-        return render_template('edit.html')
+
+        circles = Circle.Query.filter(owner=user)
+        for circle in circles:
+            for u in circle.users:
+                if fid == u.get('objectId'): 
+                    circlesIn.append(circle.name)
+
+        print circlesIn
+        return render_template('edit.html', circles=circles, circlesIn=circlesIn)
     else:
         return render_template('signup.html')
 
